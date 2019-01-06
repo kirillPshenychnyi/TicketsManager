@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp">
+
+
+    <ImageView
+        android:id="@+id/eventImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@drawable/no_image_available"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@+id/eventImageView"
+        app:layout_constraintTop_toBottomOf="@+id/eventImageView"
+        android:id="@+id/eventTitleTextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/colorPrimary"
+        tools:text="Muse"/>
+
+    <ImageView
+        android:id="@+id/calendarImageView"
+        android:layout_width="@dimen/item_image_width"
+        android:layout_height="@dimen/item_image_height"
+        android:layout_marginTop="@dimen/item_base_margin"
+        android:src="@drawable/calendar"
+        app:layout_constraintLeft_toLeftOf="@id/eventTitleTextView"
+        app:layout_constraintTop_toBottomOf="@id/eventTitleTextView" />
+
+    <ImageView
+        android:id="@+id/mapImageView"
+        android:layout_width="@dimen/item_image_width"
+        android:layout_height="@dimen/item_image_height"
+        android:layout_marginTop="@dimen/item_base_margin"
+        android:src="@drawable/map"
+        app:layout_constraintLeft_toLeftOf="@id/calendarImageView"
+        app:layout_constraintTop_toBottomOf="@id/calendarImageView" />
+
+    <TextView
+        android:id="@+id/eventDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginLeft="@dimen/item_base_margin"
+        app:layout_constraintStart_toEndOf="@id/calendarImageView"
+        app:layout_constraintTop_toTopOf="@id/calendarImageView"
+        app:layout_constraintBottom_toBottomOf="@id/calendarImageView"
+        tools:text="11 January 2019" />
+
+    <TextView
+        android:id="@+id/eventLocationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="@id/eventDateTextView"
+        app:layout_constraintTop_toTopOf="@id/mapImageView"
+        app:layout_constraintBottom_toBottomOf="@id/mapImageView"
+        tools:text="LA, CA" />
+
+    <ImageView
+        android:id="@+id/clockImageView"
+        android:layout_width="@dimen/item_image_width"
+        android:layout_height="@dimen/item_image_width"
+        android:layout_marginRight="@dimen/item_base_margin"
+        android:src="@drawable/clock"
+        app:layout_constraintRight_toLeftOf="@id/eventTimeTextView"
+        app:layout_constraintTop_toTopOf="@id/calendarImageView" />
+
+    <TextView
+        android:id="@+id/eventTimeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/base_margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/clockImageView"
+        app:layout_constraintBottom_toBottomOf="@id/clockImageView"
+        tools:text="20p.m" />
+
+</android.support.constraint.ConstraintLayout>

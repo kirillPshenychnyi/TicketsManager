@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">TicketsManager</string>
+    <string name="preferences_menu">Preferences</string>
+    <string name="tickets_menu">Tickets</string>
+    <string name="search_menu">Search Event</string>
+    <string name="searched_event">Event search by a name or an artist</string>
+    <string name="searched_county">Country</string>
+    <string name="countryExtra">countryExtra</string>
+    <string name="search">Search</string>
+
+    <string name="united_states">United States</string>
+    <string name="united_kingdom">United Kingdom</string>
+    <string name="canada">Canada</string>
+
+    <string name="us">us</string>
+    <string name="uk">uk</string>
+    <string name="ca">ca</string>
+    <string name="tba">TBA</string>
+
+</resources>

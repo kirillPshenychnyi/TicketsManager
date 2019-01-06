@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="image_width">24dp</dimen>
+    <dimen name="image_heigth">24dp</dimen>
+    <dimen name="base_margin">16dp</dimen>
+    <dimen name="item_image_width">36dp</dimen>
+    <dimen name="item_image_height">36dp</dimen>
+    <dimen name="item_base_margin">8dp</dimen>
+</resources>

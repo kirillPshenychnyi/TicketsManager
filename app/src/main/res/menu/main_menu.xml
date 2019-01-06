@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_prefs"
+            android:icon="@drawable/preferences"
+            android:title="@string/preferences_menu" />
+        <item
+            android:id="@+id/nav_tickets"
+            android:icon="@drawable/ticket"
+            android:title="@string/tickets_menu" />
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@drawable/search"
+            android:title="@string/search_menu" />
+    </group>
+</menu>
