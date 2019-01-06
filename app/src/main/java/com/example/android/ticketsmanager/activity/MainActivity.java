@@ -110,6 +110,11 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
     private void subscribeLiveData(){
         viewModel.getEventsLiveData().observe(
                 this,

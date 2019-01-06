@@ -12,7 +12,8 @@ public interface TicketMasterApi {
     @GET("/discovery/v2/events.json")
     Single<TicketsResponse> getEvents(
             @Query("countryCode")String countryCode,
-            @Query("apikey")String apiKey,
-            @Query("page")int page
+            @Query("sort") String sort,
+            @Query("page")int page,
+            @Query("apikey")String apiKey
     );
 }

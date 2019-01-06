@@ -6,7 +6,10 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
-@Database(entities = {Event.class, Image.class, Country.class, City.class, Location.class}, version = 26, exportSchema = false)
+@Database(
+        entities = {Event.class, Image.class, Country.class, City.class, Location.class},
+        version = 28,
+        exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 

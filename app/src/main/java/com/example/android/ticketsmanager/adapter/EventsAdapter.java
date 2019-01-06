@@ -1,6 +1,7 @@
 package com.example.android.ticketsmanager.adapter;
 
 import android.content.Context;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,8 +47,16 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void setEvents(List<EventInfo> events){
+        if(events.isEmpty()){
+            this.events = events;
+            notifyDataSetChanged();
+            return;
+        }
+
+        EventInfo.Comparator comparator = new EventInfo.Comparator(this.events, events);
+        DiffUtil.DiffResult productDiffResult = DiffUtil.calculateDiff(comparator);
         this.events = events;
-        notifyDataSetChanged();
+        productDiffResult.dispatchUpdatesTo(this);
     }
 
     @Override

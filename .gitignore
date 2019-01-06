@@ -7,3 +7,7 @@
 /build
 /captures
 .externalNativeBuild
+
+app/src/androidTest/java/com/example/android/ticketsmanager/ExampleInstrumentedTest\.java
+
+app/src/test/java/com/example/android/ticketsmanager/ExampleUnitTest\.java
