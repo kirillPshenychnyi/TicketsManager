@@ -2,7 +2,9 @@ package com.example.android.ticketsmanager.activity;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -52,11 +54,9 @@ public class MainActivity extends AppCompatActivity
         adapter = new EventsAdapter();
         recyclerView.setAdapter(adapter);
 
-        QueryParams.QueryParamsBuilder params = new QueryParams.QueryParamsBuilder();
-
         viewModel = ViewModelProviders.of(
                 this,
-                new ViewModelFactory(this, params.setCountryCode("UK").build())
+                new ViewModelFactory(this, createQueryParams())
         ).get(EventsViewModel.class);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -103,17 +103,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == SearchEventActivity.SEARCH_RESULT && resultCode == RESULT_OK){
-            String countryExtra = getString(R.string.countryExtra);
+            String countryExtra = getString(R.string.country_extra);
             if(data.hasExtra(countryExtra)) {
                 String country = data.getStringExtra(countryExtra);
 
                 adapter.clearList();
                 viewModel.unsubscribe(this);
 
-                QueryParams.QueryParamsBuilder params = new QueryParams.QueryParamsBuilder();
-                params.setCountryCode(StringUtils.toCounrtyCode(this, country));
+                QueryParams.QueryParamsBuilder paramsBuilder = new QueryParams.QueryParamsBuilder();
+                paramsBuilder.setCountryCode(StringUtils.toCounrtyCode(this, country));
+                QueryParams params = paramsBuilder.build();
+                saveRequestParams(params);
 
-                viewModel.setParams(params.build());
+                viewModel.setParams(params);
                 subscribeLiveData();
                 loadInitial();
 
@@ -151,5 +153,24 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
         );
+    }
+
+    private QueryParams createQueryParams(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        QueryParams.QueryParamsBuilder builder = new QueryParams.QueryParamsBuilder();
+
+        return
+                builder.setCountryCode(preferences.getString(getString(R.string.country_code), "UK"))
+                .build();
+    }
+
+    private void saveRequestParams(QueryParams params){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString(getString(R.string.country_code) ,params.getCountryCode());
+
+        editor.commit();
     }
 }

@@ -5,7 +5,7 @@
     <string name="search_menu">Search Event</string>
     <string name="searched_event">Event search by a name or an artist</string>
     <string name="searched_county">Country</string>
-    <string name="countryExtra">countryExtra</string>
+    <string name="country_extra">countryExtra</string>
     <string name="search">Search</string>
 
     <string name="united_states">United States</string>
@@ -17,7 +17,6 @@
     <string name="ca">CA</string>
     <string name="tba">TBA</string>
 
-    <string name="total_pages">total_pages</string>
-    <string name="last_requested_page">last_requested_page</string>
+    <string name="country_code">country_code</string>
 
 </resources>

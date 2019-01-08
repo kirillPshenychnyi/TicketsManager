@@ -14,8 +14,6 @@ import com.example.android.ticketsmanager.R;
 
 public class SearchEventActivity extends AppCompatActivity {
 
-    public static int SEARCH_RESULT = 542;
-
     private Spinner mCountriesSpinner;
 
     @Override
@@ -50,11 +48,10 @@ public class SearchEventActivity extends AppCompatActivity {
     }
 
     public void onSearchButtonClicked(View view) {
-
         String country = mCountriesSpinner.getSelectedItem().toString();
 
         Intent result = new Intent();
-        result.putExtra(getString(R.string.countryExtra), country);
+        result.putExtra(getString(R.string.country_extra), country);
 
         setResult(RESULT_OK, result);
 
