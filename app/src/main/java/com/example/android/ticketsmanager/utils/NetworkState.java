@@ -8,7 +8,6 @@ public class NetworkState {
         FAILED
     }
 
-
     private final Status status;
     private final String msg;
 

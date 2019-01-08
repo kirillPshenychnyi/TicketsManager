@@ -7,8 +7,8 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 @Database(
-        entities = {Event.class, Image.class, Country.class, City.class, Location.class},
-        version = 28,
+        entities = {Event.class, Image.class, Country.class, City.class, Location.class, RequestInfo.class},
+        version = 29,
         exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
@@ -34,9 +34,11 @@ public abstract class AppDatabase extends RoomDatabase {
         return sInstance;
     }
 
-    public abstract EventDAO takeEventDao();
+    public abstract EventDAO getEventDao();
 
-    public abstract ImageDAO takeImageDAO();
+    public abstract ImageDAO getImageDAO();
 
-    public abstract LocationDao takeLocationDao();
+    public abstract LocationDao getLocationDao();
+
+    public abstract RequestInfoDao getRequestInfoDao();
 }

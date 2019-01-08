@@ -15,8 +15,13 @@ import android.view.MenuItem;
 import com.example.android.ticketsmanager.R;
 import com.example.android.ticketsmanager.adapter.EventsAdapter;
 import com.example.android.ticketsmanager.datasource.QueryParams;
+import com.example.android.ticketsmanager.db.EventInfo;
+import com.example.android.ticketsmanager.utils.NetworkState;
+import com.example.android.ticketsmanager.utils.StringUtils;
 import com.example.android.ticketsmanager.viewmodel.EventsViewModel;
 import com.example.android.ticketsmanager.viewmodel.ViewModelFactory;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
     implements  NavigationView.OnNavigationItemSelectedListener {
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         subscribeLiveData();
+        loadInitial();
 
         DividerItemDecoration itemDecoration = new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL
@@ -97,35 +103,53 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == SearchEventActivity.SEARCH_RESULT && resultCode == RESULT_OK){
-            adapter.clearList();
+            String countryExtra = getString(R.string.countryExtra);
+            if(data.hasExtra(countryExtra)) {
+                String country = data.getStringExtra(countryExtra);
 
-            viewModel.unsubscribe(this);
-            QueryParams.QueryParamsBuilder params = new QueryParams.QueryParamsBuilder();
-            viewModel.setParams(params.setCountryCode("US").build());
+                adapter.clearList();
+                viewModel.unsubscribe(this);
 
-            subscribeLiveData();
-            return;
+                QueryParams.QueryParamsBuilder params = new QueryParams.QueryParamsBuilder();
+                params.setCountryCode(StringUtils.toCounrtyCode(this, country));
+
+                viewModel.setParams(params.build());
+                subscribeLiveData();
+                loadInitial();
+
+                return;
+            }
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    private void setEventsList(List<EventInfo> eventsList){
+        adapter.setEvents(eventsList);
+    }
+
+    private void loadInitial(){
+        viewModel.fetchFromDb(
+                eventsList -> {
+                    if(eventsList.isEmpty()){
+                        viewModel.searchEvents();
+                    }else {
+                        setEventsList(eventsList);
+                    }
+                }
+        );
     }
 
     private void subscribeLiveData(){
-        viewModel.getEventsLiveData().observe(
-                this,
-                eventInfos -> adapter.setEvents(eventInfos)
-        );
-
         viewModel.getNetworkStateLiveData().observe(
                 this,
-                networkState -> adapter.setNetworkState(networkState)
-        );
+                networkState -> {
+                    adapter.setNetworkState(networkState);
 
-        viewModel.searchEvents();
+                    if(networkState == NetworkState.LOADED){
+                        viewModel.fetchFromDb(this::setEventsList);
+                    }
+                }
+        );
     }
 }

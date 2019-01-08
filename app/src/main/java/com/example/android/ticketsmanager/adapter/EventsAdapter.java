@@ -47,12 +47,6 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void setEvents(List<EventInfo> events){
-        if(events.isEmpty()){
-            this.events = events;
-            notifyDataSetChanged();
-            return;
-        }
-
         EventInfo.Comparator comparator = new EventInfo.Comparator(this.events, events);
         DiffUtil.DiffResult productDiffResult = DiffUtil.calculateDiff(comparator);
         this.events = events;

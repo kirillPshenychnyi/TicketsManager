@@ -13,51 +13,61 @@ import com.example.android.ticketsmanager.utils.NetworkState;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class EventsViewModel extends ViewModel {
 
-    private LiveData<List<EventInfo>> eventsLiveData;
+    public interface OnDbResult{
+        void onResult(List<EventInfo> infos);
+    }
+
     private final Context context;
     private QueryParams params;
     private final EventsDataSource dataSource;
 
     public EventsViewModel(Context context, QueryParams params){
         this.context = context;
-        this.params = params;
-        dataSource = new EventsDataSource(context);
 
-        eventsLiveData = AppDatabase.getsInstance(context).takeEventDao().loadAll(params.getCountryCode());
+        dataSource = new EventsDataSource(context);
+        setParams(params);
     }
 
     public void unsubscribe(LifecycleOwner owner){
-        eventsLiveData.removeObservers(owner);
         dataSource.getNetworkState().removeObservers(owner);
+        dataSource.reset();
     }
 
     public void setParams(QueryParams params){
         this.params = params;
-        eventsLiveData = AppDatabase.getsInstance(context).takeEventDao().loadAll(params.getCountryCode());
+        dataSource.setQueryParams(params);
     }
 
     public void searchEvents(){
-        if(shouldRequest()){
-            fetchMore();
-        }
+        Maybe<List<EventInfo>> flowable
+                = AppDatabase.getsInstance(context).getEventDao().loadAll(params.getCountryCode());
+
+        flowable
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(eventInfos -> {
+                if(eventInfos.isEmpty()) {
+                    fetchMore();
+                }
+            });
     }
 
-    private boolean shouldRequest(){
-        if(eventsLiveData == null){
-            return true;
-        }
-
-        List<EventInfo> eventInfos = eventsLiveData.getValue();
-        return eventInfos == null || eventInfos.isEmpty();
+    public void fetchFromDb(OnDbResult onDbResult){
+        AppDatabase.getsInstance(context).getEventDao().loadAll(params.getCountryCode())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(eventInfos -> onDbResult.onResult(eventInfos) );
     }
 
     public void fetchMore(){
-        dataSource.fetchMore(params);
+        dataSource.fetchMore();
     }
-
-    public LiveData<List<EventInfo>> getEventsLiveData() { return eventsLiveData; }
 
     public LiveData<NetworkState> getNetworkStateLiveData(){ return dataSource.getNetworkState(); }
 }

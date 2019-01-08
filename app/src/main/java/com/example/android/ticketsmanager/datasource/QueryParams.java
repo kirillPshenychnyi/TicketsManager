@@ -18,9 +18,9 @@ public class QueryParams {
         private QueryParams result;
     }
 
-    private QueryParams(){}
-
     private String countryCode;
+
+    private QueryParams(){}
 
     public String getCountryCode() {
         return countryCode;
@@ -28,5 +28,10 @@ public class QueryParams {
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
+    }
+
+    @Override
+    public int hashCode() {
+        return countryCode.hashCode();
     }
 }

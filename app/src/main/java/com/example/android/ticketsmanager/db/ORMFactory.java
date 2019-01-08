@@ -26,7 +26,7 @@ public class ORMFactory {
                         insertCountry(venue.getCountry().getCountryCode())
                 );
 
-        long id = database.takeEventDao().insertEvent(
+        long id = database.getEventDao().insertEvent(
                 new Event(
                         insertLocation(venue.getName(), cityId),
                         event.getName(),
@@ -36,7 +36,7 @@ public class ORMFactory {
         );
 
         for(com.example.android.ticketsmanager.rest.JOM.Image image : event.getImages()){
-            database.takeImageDAO().insertImage(
+            database.getImageDAO().insertImage(
                     new Image(
                             image.getUrl(),
                             image.getWidth(),
@@ -49,7 +49,7 @@ public class ORMFactory {
 
     private long insertCountry(String countryName){
 
-        LocationDao dao = database.takeLocationDao();
+        LocationDao dao = database.getLocationDao();
 
         Country country = dao.getCountry(countryName);
 
@@ -62,7 +62,7 @@ public class ORMFactory {
 
     private long insertCity(String cityName, long countryId){
 
-        LocationDao dao = database.takeLocationDao();
+        LocationDao dao = database.getLocationDao();
 
         City city = dao.getCity(cityName);
 
@@ -75,7 +75,7 @@ public class ORMFactory {
 
     private long insertLocation(String locationName, long cityId){
 
-        LocationDao locationDao = database.takeLocationDao();
+        LocationDao locationDao = database.getLocationDao();
 
         com.example.android.ticketsmanager.db.Location location =
                 locationDao.getLocation(locationName);

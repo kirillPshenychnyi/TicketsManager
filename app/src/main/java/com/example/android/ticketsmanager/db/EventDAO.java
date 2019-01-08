@@ -1,13 +1,13 @@
 package com.example.android.ticketsmanager.db;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.paging.DataSource;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
 import java.util.List;
+
+import io.reactivex.Maybe;
 
 @Dao
 public interface EventDAO {
@@ -27,5 +27,5 @@ public interface EventDAO {
                     "AND Country.countryName LIKE :countryCode " +
                     "ORDER BY startDate ASC"
     )
-    LiveData<List<EventInfo>> loadAll(String countryCode);
+    Maybe<List<EventInfo>> loadAll(String countryCode);
 }
