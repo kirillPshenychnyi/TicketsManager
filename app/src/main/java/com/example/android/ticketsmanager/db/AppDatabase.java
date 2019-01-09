@@ -8,7 +8,7 @@ import android.content.Context;
 
 @Database(
         entities = {Event.class, Image.class, Country.class, City.class, Location.class, RequestInfo.class},
-        version = 29,
+        version = 30,
         exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {

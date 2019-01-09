@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import com.example.android.ticketsmanager.R;
 import com.example.android.ticketsmanager.adapter.EventsAdapter;
 import com.example.android.ticketsmanager.datasource.QueryParams;
+import com.example.android.ticketsmanager.datasource.RequestExtractor;
 import com.example.android.ticketsmanager.db.EventInfo;
 import com.example.android.ticketsmanager.utils.NetworkState;
 import com.example.android.ticketsmanager.utils.StringUtils;
@@ -103,24 +104,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == SearchEventActivity.SEARCH_RESULT && resultCode == RESULT_OK){
-            String countryExtra = getString(R.string.country_extra);
-            if(data.hasExtra(countryExtra)) {
-                String country = data.getStringExtra(countryExtra);
 
-                adapter.clearList();
-                viewModel.unsubscribe(this);
+            adapter.clearList();
+            viewModel.unsubscribe(this);
 
-                QueryParams.QueryParamsBuilder paramsBuilder = new QueryParams.QueryParamsBuilder();
-                paramsBuilder.setCountryCode(StringUtils.toCounrtyCode(this, country));
-                QueryParams params = paramsBuilder.build();
-                saveRequestParams(params);
+            QueryParams params = createQueryParams(data);
+            saveRequestParams(params);
 
-                viewModel.setParams(params);
-                subscribeLiveData();
-                loadInitial();
+            viewModel.setParams(params);
+            subscribeLiveData();
+            loadInitial();
 
-                return;
-            }
+            return;
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -155,13 +150,38 @@ public class MainActivity extends AppCompatActivity
         );
     }
 
+    private QueryParams createQueryParams(Intent data){
+        QueryParams.QueryParamsBuilder paramsBuilder = new QueryParams.QueryParamsBuilder();
+
+        RequestExtractor extractor = new RequestExtractor(this, data);
+
+        extractor.setExtra(
+                R.string.country_extra,
+                data::getStringExtra,
+                (countryName) ->
+                        paramsBuilder.setCountryCode((StringUtils.toCounrtyCode(
+                                this,
+                                countryName))
+                        )
+        );
+
+        extractor.setExtra(
+                R.string.keyword_extra,
+                data::getStringExtra,
+                paramsBuilder::setKeyword
+        );
+
+        return paramsBuilder.build();
+    }
+
     private QueryParams createQueryParams(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         QueryParams.QueryParamsBuilder builder = new QueryParams.QueryParamsBuilder();
 
-        return
-                builder.setCountryCode(preferences.getString(getString(R.string.country_code), "UK"))
+        return builder
+                .setCountryCode(preferences.getString(getString(R.string.country_code), "UK"))
+                .setKeyword(preferences.getString(getString(R.string.keyword_extra), ""))
                 .build();
     }
 
@@ -170,6 +190,7 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.putString(getString(R.string.country_code) ,params.getCountryCode());
+        editor.putString(getString(R.string.keyword_extra), params.getKeyword());
 
         editor.commit();
     }

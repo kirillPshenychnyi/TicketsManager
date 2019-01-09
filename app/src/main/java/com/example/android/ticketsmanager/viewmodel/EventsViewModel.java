@@ -8,6 +8,7 @@ import android.content.Context;
 import com.example.android.ticketsmanager.datasource.EventsDataSource;
 import com.example.android.ticketsmanager.datasource.QueryParams;
 import com.example.android.ticketsmanager.db.AppDatabase;
+import com.example.android.ticketsmanager.db.EventDAO;
 import com.example.android.ticketsmanager.db.EventInfo;
 import com.example.android.ticketsmanager.utils.NetworkState;
 
@@ -46,7 +47,10 @@ public class EventsViewModel extends ViewModel {
 
     public void searchEvents(){
         Maybe<List<EventInfo>> flowable
-                = AppDatabase.getsInstance(context).getEventDao().loadAll(params.getCountryCode());
+                =   AppDatabase.getsInstance(context).getEventDao().loadAll(
+                        params.getCountryCode(),
+                        params.getKeyword()
+                    );
 
         flowable
             .subscribeOn(Schedulers.io())
@@ -59,10 +63,21 @@ public class EventsViewModel extends ViewModel {
     }
 
     public void fetchFromDb(OnDbResult onDbResult){
-        AppDatabase.getsInstance(context).getEventDao().loadAll(params.getCountryCode())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(eventInfos -> onDbResult.onResult(eventInfos) );
+        EventDAO dao = AppDatabase.getsInstance(context).getEventDao();
+
+        String keyword = params.getKeyword();
+
+        if(keyword != null) {
+            subscribe(dao.loadAll(params.getCountryCode(), keyword), onDbResult);
+        }else {
+            subscribe(dao.loadAll(params.getCountryCode()), onDbResult);
+        }
+    }
+
+    private void subscribe(Maybe<List<EventInfo>> request, OnDbResult onDbResult){
+        request.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(eventInfos -> onDbResult.onResult(eventInfos));
     }
 
     public void fetchMore(){
