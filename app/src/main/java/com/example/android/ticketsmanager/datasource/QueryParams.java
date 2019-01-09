@@ -13,6 +13,11 @@ public class QueryParams {
             return this;
         }
 
+        public QueryParamsBuilder setKeyword(String keyword){
+            result.setKeyword(keyword);
+            return this;
+        }
+
         public QueryParams build(){ return result; }
 
         private QueryParams result;
@@ -20,18 +25,34 @@ public class QueryParams {
 
     private String countryCode;
 
+    private String keyword;
+
     private QueryParams(){}
 
     public String getCountryCode() {
         return countryCode;
     }
 
-    public void setCountryCode(String countryCode) {
+    private void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
+    }
+
+    public String getKeyword() {
+        if(keyword.isEmpty()){
+            return null;
+        }
+        return "%" + keyword + "%";
+    }
+
+    private void setKeyword(String keyword) {
+        this.keyword = keyword;
     }
 
     @Override
     public int hashCode() {
-        return countryCode.hashCode();
+        int hash = 7;
+        hash = 29 * hash + countryCode.hashCode();
+        hash = 29 * hash + keyword.hashCode();
+        return hash;
     }
 }

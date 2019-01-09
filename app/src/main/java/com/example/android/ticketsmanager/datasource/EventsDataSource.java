@@ -22,8 +22,6 @@ import io.reactivex.schedulers.Schedulers;
 
 public class EventsDataSource{
 
-    private static final String SORT_ORDER = "date,asc";
-
     private CompositeDisposable compositeDisposable;
     private final ORMFactory ormFactory;
     private final Context context;
@@ -97,7 +95,7 @@ public class EventsDataSource{
 
         Disposable disposable = App.getApi().getEvents(
                 queryParams.getCountryCode(),
-                SORT_ORDER,
+                queryParams.getKeyword(),
                 currentPage,
                 App.getApiKey()
         )
@@ -105,9 +103,26 @@ public class EventsDataSource{
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(events -> onLoaded(events), this::onError);
 
-        ++currentPage;
+        incrementPage();
 
         compositeDisposable.add(disposable);
+    }
+
+    private void incrementPage() {
+        ++currentPage;
+
+        RequestInfoDao requestInfoDao = AppDatabase.getsInstance(context).getRequestInfoDao();
+        long id = queryParams.hashCode();
+
+        Disposable adding =
+                Completable.fromAction(() -> {
+                    requestInfoDao.updateLastPage(id, currentPage);
+                })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(() -> {}, this::onError);
+
+        compositeDisposable.add(adding);
     }
 
     private void onParamsLoaded(RequestInfo info){
@@ -124,9 +139,8 @@ public class EventsDataSource{
 
         if(totalPages == -1){
             totalPages = response.getPage().getTotalPages();
+            saveRequestInfo();
         }
-
-        saveRequestInfo();
 
         EventsCollection collection = response.getEventsCollection();
 

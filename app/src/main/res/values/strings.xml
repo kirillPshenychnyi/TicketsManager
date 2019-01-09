@@ -5,8 +5,10 @@
     <string name="search_menu">Search Event</string>
     <string name="searched_event">Event search by a name or an artist</string>
     <string name="searched_county">Country</string>
-    <string name="country_extra">countryExtra</string>
     <string name="search">Search</string>
+
+    <string name="country_extra">countryExtra</string>
+    <string name="keyword_extra">keywordExtra</string>
 
     <string name="united_states">United States</string>
     <string name="united_kingdom">United Kingdom</string>
