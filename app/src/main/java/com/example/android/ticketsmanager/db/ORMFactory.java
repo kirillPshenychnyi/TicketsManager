@@ -18,7 +18,6 @@ public class ORMFactory {
     }
 
     public void convert(com.example.android.ticketsmanager.rest.JOM.Event event){
-
         Venue venue = event.getVenues().getVenues().get(0);
         long cityId =
                 insertCity(
@@ -48,7 +47,6 @@ public class ORMFactory {
     }
 
     private long insertCountry(String countryName){
-
         LocationDao dao = database.getLocationDao();
 
         Country country = dao.getCountry(countryName);
@@ -61,7 +59,6 @@ public class ORMFactory {
     }
 
     private long insertCity(String cityName, long countryId){
-
         LocationDao dao = database.getLocationDao();
 
         City city = dao.getCity(cityName);
@@ -74,7 +71,6 @@ public class ORMFactory {
     }
 
     private long insertLocation(String locationName, long cityId){
-
         LocationDao locationDao = database.getLocationDao();
 
         com.example.android.ticketsmanager.db.Location location =
@@ -89,8 +85,11 @@ public class ORMFactory {
         );
     }
 
-    private java.util.Date convert(Date date) {
+    long insertSegment(){
 
+    }
+
+    private java.util.Date convert(Date date) {
         if(date == null){
             return null;
         }

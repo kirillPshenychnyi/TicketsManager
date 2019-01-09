@@ -4,9 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.Relation;
 import android.support.v7.util.DiffUtil;
 
 import java.util.Date;
@@ -50,23 +48,52 @@ public class Event {
     @ColumnInfo(index = true)
     private long location_id;
 
+    private long segmentId;
+
+    private long genreId;
+
+    private long subGenreId;
+
     private String name;
 
     private Date startDate;
     private Date endDate;
 
     @Ignore
-    public Event(long location_id, String name, Date startDate, Date endDate){
+    public Event(
+            long location_id,
+            long segmentId,
+            long genreId,
+            long subGenreId,
+            String name,
+            Date startDate,
+            Date endDate
+    ){
         this.location_id = location_id;
+        this.segmentId = segmentId;
+        this.genreId = genreId;
+        this.subGenreId = subGenreId;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public Event(long location_id, long event_id, String name, Date startDate, Date endDate){
+    public Event(
+            long event_id,
+            long location_id,
+            long segmentId,
+            long genreId,
+            long subGenreId,
+            String name,
+            Date startDate,
+            Date endDate
+    ){
         this.location_id = location_id;
-        this.name = name;
         this.event_id = event_id;
+        this.segmentId = segmentId;
+        this.genreId = genreId;
+        this.subGenreId = subGenreId;
+        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -91,5 +118,29 @@ public class Event {
 
     public void setEvent_id(long event_id) {
         this.event_id = event_id;
+    }
+
+    public long getSegmentId() {
+        return segmentId;
+    }
+
+    public void setSegmentId(long segmentId) {
+        this.segmentId = segmentId;
+    }
+
+    public long getGenreId() {
+        return genreId;
+    }
+
+    public void setGenreId(long genreId) {
+        this.genreId = genreId;
+    }
+
+    public long getSubGenreId() {
+        return subGenreId;
+    }
+
+    public void setSubGenreId(long subGenreId) {
+        this.subGenreId = subGenreId;
     }
 }

@@ -1,7 +1,5 @@
 package com.example.android.ticketsmanager.rest.JOM;
 
-import android.support.v7.util.DiffUtil;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -44,6 +42,10 @@ public class Event {
     @SerializedName("_embedded")
     @Expose
     private Venues venues;
+
+    @SerializedName("classifications")
+    @Expose
+    private List<Classification> classifications = null;
 
     public String getName() {
         return name;
@@ -115,5 +117,13 @@ public class Event {
 
     public Venues getVenues() {
         return this.venues;
+    }
+
+    public List<Classification> getClassifications() {
+        return classifications;
+    }
+
+    public void setClassifications(List<Classification> classifications) {
+        this.classifications = classifications;
     }
 }

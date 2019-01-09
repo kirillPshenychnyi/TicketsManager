@@ -6,5 +6,5 @@ import android.arch.persistence.room.Insert;
 @Dao
 public interface ImageDAO {
     @Insert
-    Long insertImage(Image newEntry);
+    long insertImage(Image newEntry);
 }
