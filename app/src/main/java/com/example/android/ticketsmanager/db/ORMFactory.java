@@ -2,6 +2,7 @@ package com.example.android.ticketsmanager.db;
 
 import android.content.Context;
 
+import com.example.android.ticketsmanager.rest.JOM.Classification;
 import com.example.android.ticketsmanager.rest.JOM.Date;
 import com.example.android.ticketsmanager.rest.JOM.Venue;
 
@@ -19,6 +20,7 @@ public class ORMFactory {
 
     public void convert(com.example.android.ticketsmanager.rest.JOM.Event event){
         Venue venue = event.getVenues().getVenues().get(0);
+
         long cityId =
                 insertCity(
                         venue.getCity().getName(),
@@ -28,6 +30,7 @@ public class ORMFactory {
         long id = database.getEventDao().insertEvent(
                 new Event(
                         insertLocation(venue.getName(), cityId),
+                        insertClassification(event.getClassifications().get(0)),
                         event.getName(),
                         convert(event.getDates().getStart()),
                         convert(event.getDates().getEnd())
@@ -46,6 +49,48 @@ public class ORMFactory {
         }
     }
 
+    private long insertClassification(Classification classification){
+        ClassificationDao dao = database.getClassificationDao();
+
+        long segmentId = insertSegment(classification.getSegment().getName());
+        long genreId = insertGenre(classification.getGenre().getName(), segmentId);
+
+        return insertSubGenre(classification.getSubGenre().getName(), genreId);
+    }
+
+    private long insertSegment(String segmentName){
+        ClassificationDao dao = database.getClassificationDao();
+        Segment segment = dao.getSegment(segmentName);
+        if(segment != null){
+            return segment.getSegmentId();
+        }
+
+        return dao.insertSegment(new Segment(segmentName));
+    }
+
+    private long insertGenre(String genreName, long segmentId){
+        ClassificationDao dao = database.getClassificationDao();
+        Genre genre = dao.getGenre(genreName);
+
+        if(genre != null){
+            return genre.getGenreId();
+        }
+
+        return dao.insertGenre(new Genre(genreName, segmentId));
+    }
+
+    private long insertSubGenre(String subGenreName, long genreId){
+        ClassificationDao dao = database.getClassificationDao();
+
+        SubGenre subGenre = dao.getSubGenre(subGenreName);
+
+        if(subGenre != null){
+            return subGenre.getGenreId();
+        }
+
+        return dao.insertSubGenre(new SubGenre(subGenreName, genreId));
+    }
+
     private long insertCountry(String countryName){
         LocationDao dao = database.getLocationDao();
 
@@ -59,6 +104,7 @@ public class ORMFactory {
     }
 
     private long insertCity(String cityName, long countryId){
+
         LocationDao dao = database.getLocationDao();
 
         City city = dao.getCity(cityName);
@@ -83,10 +129,6 @@ public class ORMFactory {
         return locationDao.insertLocation(
                 new com.example.android.ticketsmanager.db.Location(locationName, cityId)
         );
-    }
-
-    long insertSegment(){
-
     }
 
     private java.util.Date convert(Date date) {

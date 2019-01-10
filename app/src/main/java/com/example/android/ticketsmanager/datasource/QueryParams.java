@@ -39,7 +39,7 @@ public class QueryParams {
 
     public String getKeyword() {
         if(keyword.isEmpty()){
-            return null;
+            return "%";
         }
         return "%" + keyword + "%";
     }
@@ -47,6 +47,8 @@ public class QueryParams {
     private void setKeyword(String keyword) {
         this.keyword = keyword;
     }
+
+    public boolean hasKeyword(){ return !keyword.isEmpty(); }
 
     @Override
     public int hashCode() {

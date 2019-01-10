@@ -48,10 +48,6 @@ public class Event {
     @ColumnInfo(index = true)
     private long location_id;
 
-    private long segmentId;
-
-    private long genreId;
-
     private long subGenreId;
 
     private String name;
@@ -62,16 +58,12 @@ public class Event {
     @Ignore
     public Event(
             long location_id,
-            long segmentId,
-            long genreId,
             long subGenreId,
             String name,
             Date startDate,
             Date endDate
     ){
         this.location_id = location_id;
-        this.segmentId = segmentId;
-        this.genreId = genreId;
         this.subGenreId = subGenreId;
         this.name = name;
         this.startDate = startDate;
@@ -81,8 +73,6 @@ public class Event {
     public Event(
             long event_id,
             long location_id,
-            long segmentId,
-            long genreId,
             long subGenreId,
             String name,
             Date startDate,
@@ -90,8 +80,6 @@ public class Event {
     ){
         this.location_id = location_id;
         this.event_id = event_id;
-        this.segmentId = segmentId;
-        this.genreId = genreId;
         this.subGenreId = subGenreId;
         this.name = name;
         this.startDate = startDate;
@@ -118,22 +106,6 @@ public class Event {
 
     public void setEvent_id(long event_id) {
         this.event_id = event_id;
-    }
-
-    public long getSegmentId() {
-        return segmentId;
-    }
-
-    public void setSegmentId(long segmentId) {
-        this.segmentId = segmentId;
-    }
-
-    public long getGenreId() {
-        return genreId;
-    }
-
-    public void setGenreId(long genreId) {
-        this.genreId = genreId;
     }
 
     public long getSubGenreId() {

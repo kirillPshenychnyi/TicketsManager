@@ -95,7 +95,7 @@ public class EventsDataSource{
 
         Disposable disposable = App.getApi().getEvents(
                 queryParams.getCountryCode(),
-                queryParams.getKeyword(),
+                queryParams.hasKeyword() ?  queryParams.getKeyword() : null,
                 currentPage,
                 App.getApiKey()
         )

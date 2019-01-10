@@ -65,13 +65,7 @@ public class EventsViewModel extends ViewModel {
     public void fetchFromDb(OnDbResult onDbResult){
         EventDAO dao = AppDatabase.getsInstance(context).getEventDao();
 
-        String keyword = params.getKeyword();
-
-        if(keyword != null) {
-            subscribe(dao.loadAll(params.getCountryCode(), keyword), onDbResult);
-        }else {
-            subscribe(dao.loadAll(params.getCountryCode()), onDbResult);
-        }
+        subscribe(dao.loadAll(params.getCountryCode(), params.getKeyword()), onDbResult);
     }
 
     private void subscribe(Maybe<List<EventInfo>> request, OnDbResult onDbResult){

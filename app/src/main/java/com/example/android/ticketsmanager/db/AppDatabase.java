@@ -11,7 +11,7 @@ import android.content.Context;
                 Event.class, Image.class, Country.class, City.class, Location.class,
                 RequestInfo.class, Segment.class, Genre.class, SubGenre.class
         },
-        version = 31,
+        version = 32,
         exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {

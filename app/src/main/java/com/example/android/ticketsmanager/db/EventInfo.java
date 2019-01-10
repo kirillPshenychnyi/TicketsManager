@@ -52,6 +52,12 @@ public class EventInfo {
 
     private String countryName;
 
+    private String segmentName;
+
+    private String genreName;
+
+    private String subGenreName;
+
     @Relation(parentColumn = "eventId", entityColumn = "eventId")
     private List<Image> images;
 
@@ -110,6 +116,31 @@ public class EventInfo {
     public void setCountryName(String countryName) {
         this.countryName = countryName;
     }
+
+    public String getSegmentName() {
+        return segmentName;
+    }
+
+    public void setSegmentName(String segmentName) {
+        this.segmentName = segmentName;
+    }
+
+    public String getGenreName() {
+        return genreName;
+    }
+
+    public void setGenreName(String genreName) {
+        this.genreName = genreName;
+    }
+
+    public String getSubGenreName() {
+        return subGenreName;
+    }
+
+    public void setSubGenreName(String subGenreName) {
+        this.subGenreName = subGenreName;
+    }
+
 
     @Override
     public boolean equals(Object obj) {
