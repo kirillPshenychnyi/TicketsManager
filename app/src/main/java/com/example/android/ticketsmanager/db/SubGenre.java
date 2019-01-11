@@ -1,5 +1,6 @@
 package com.example.android.ticketsmanager.db;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
@@ -15,6 +16,7 @@ public class SubGenre {
     @PrimaryKey(autoGenerate = true)
     private long subGenreId;
 
+    @ColumnInfo(index = true)
     private long genreId;
 
     private String subGenreName;
