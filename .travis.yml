@@ -12,23 +12,19 @@ cache:
  - $HOME/.gradle/wrapper/
 
 android:
+  licenses:
+   - android-sdk-preview-license-.+
+   - android-sdk-license-.+
+   - google-gdk-license-.+
   components:
-
     # The BuildTools version
     - build-tools-27.0.1
-
     # The SDK version used to compile project
     - android-26
-
     # Additional components
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    
-licenses:
- - android-sdk-preview-license-.+
- - android-sdk-license-.+
- - google-gdk-license-.+    
-    
+        
 before_install:
   - chmod +x gradlew
