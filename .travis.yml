@@ -1,14 +1,37 @@
 language: android
-android:
-  components:
+sudo: required
+jdk: oraclejdk8
 
+cache:
+ directories:
+ - $HOME/.gradle/caches/
+ - $HOME/.gradle/wrapper/
+
+android:
+  licenses:
+   - android-sdk-preview-license-.+
+   - android-sdk-license-.+
+   - google-gdk-license-.+
+  components:
+    - tools
+    - platform-tools
     # The BuildTools version
     - build-tools-27.0.1
-
     # The SDK version used to compile project
     - android-26
-
     # Additional components
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
+        
+before_script:
+ - mkdir -p "$ANDROID_HOME/licenses"
+ - cp ./licenses/* "$ANDROID_HOME/licenses/"
+
+
+before_cache:
+ - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+ - rm -fr $HOME/.gradle/caches/*/plugin-resolution/        
+        
+before_install:
+  - chmod +x gradlew
