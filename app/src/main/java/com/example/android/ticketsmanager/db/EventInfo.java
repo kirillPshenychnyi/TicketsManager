@@ -1,5 +1,6 @@
 package com.example.android.ticketsmanager.db;
 
+import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.Relation;
 import android.support.v7.util.DiffUtil;
 
@@ -40,6 +41,7 @@ public class EventInfo {
         }
     }
 
+    @PrimaryKey
     private long eventId;
 
     private String eventName;

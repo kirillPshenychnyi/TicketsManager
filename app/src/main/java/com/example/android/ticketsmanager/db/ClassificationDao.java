@@ -10,18 +10,18 @@ public interface ClassificationDao {
     @Insert
     long insertGenre(Genre genre);
 
-    @Query("SELECT * FROM Genre WHERE Genre.genreName = :genreName")
-    Genre getGenre(String genreName);
+    @Query("SELECT * FROM Genre WHERE Genre.genreId = :genreId")
+    Genre getGenre(long genreId);
 
     @Insert
     long insertSubGenre(SubGenre subGenre);
 
-    @Query("SELECT * FROM SubGenre WHERE SubGenre.subGenreName = :subGenreName")
-    SubGenre getSubGenre(String subGenreName);
+    @Query("SELECT * FROM SubGenre WHERE SubGenre.subGenreId = :subGenreId")
+    SubGenre getSubGenre(long subGenreId);
 
     @Insert
     long insertSegment(Segment segment);
 
-    @Query("SELECT * FROM Segment WHERE Segment.segmentName = :segmentName")
-    Segment getSegment(String segmentName);
+    @Query("SELECT * FROM Segment WHERE Segment.segmentId = :segmentId")
+    Segment getSegment(long segmentId);
 }

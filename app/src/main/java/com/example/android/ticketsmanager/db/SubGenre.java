@@ -3,7 +3,6 @@ package com.example.android.ticketsmanager.db;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(foreignKeys = @ForeignKey(
@@ -13,7 +12,7 @@ import android.arch.persistence.room.PrimaryKey;
 ))
 public class SubGenre {
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private long subGenreId;
 
     @ColumnInfo(index = true)
@@ -24,12 +23,6 @@ public class SubGenre {
     public SubGenre(long subGenreId, long genreId, String subGenreName) {
         this.genreId = genreId;
         this.subGenreId = subGenreId;
-        this.subGenreName = subGenreName;
-    }
-
-    @Ignore
-    public SubGenre(String subGenreName, long genreId) {
-        this.genreId = genreId;
         this.subGenreName = subGenreName;
     }
 

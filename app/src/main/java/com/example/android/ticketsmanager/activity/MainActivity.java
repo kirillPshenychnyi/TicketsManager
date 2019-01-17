@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
                 eventsList -> {
                     if(eventsList.isEmpty()){
                         viewModel.searchEvents();
-                    }else {
+                    } else {
                         setEventsList(eventsList);
                     }
                 }
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.putString(getString(R.string.country_code) ,params.getCountryCode());
-        editor.putString(getString(R.string.keyword_extra), params.getKeyword());
+        editor.putString(getString(R.string.keyword_extra), params.getKeywordRaw());
 
         editor.commit();
     }

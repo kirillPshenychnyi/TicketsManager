@@ -153,11 +153,13 @@ public class EventsDataSource{
                             for (Event event : collection.getEvents()) {
                                 ormFactory.convert(event);
                             }
+
+                            networkState.postValue(NetworkState.LOADED);
                         }
                 )
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(() -> networkState.setValue(NetworkState.LOADED), this::onError);
+                        .subscribe(() -> {}, this::onError);
 
         compositeDisposable.add(adding);
     }
@@ -182,6 +184,7 @@ public class EventsDataSource{
     }
 
     private void onError(Throwable error){
+        networkState.setValue(NetworkState.FAIL);
         Log.d(EventsDataSource.class.getName(), error.getMessage());
     }
 }

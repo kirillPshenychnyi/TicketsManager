@@ -28,17 +28,20 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private List<EventInfo> events;
     private NetworkState networkState;
-
+    private NetworkStateItemViewHolder networkHolder;
+    
     public EventsAdapter(){
         events = new ArrayList<>();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(position == getItemCount() - 1 && networkState != null && networkState == NetworkState.LOADING)
+        if(position == getItemCount() - 1) {
             return TYPE_PROGRESS;
-        else
+        }
+        else {
             return TYPE_ITEM;
+        }
     }
 
     @Override
@@ -47,9 +50,16 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void setEvents(List<EventInfo> events){
+        if(events.isEmpty()){
+            this.events.clear();
+            notifyDataSetChanged();
+            return;
+        }
+
         EventInfo.Comparator comparator = new EventInfo.Comparator(this.events, events);
         DiffUtil.DiffResult productDiffResult = DiffUtil.calculateDiff(comparator);
         this.events = events;
+        notifyDataSetChanged();
         productDiffResult.dispatchUpdatesTo(this);
     }
 
@@ -127,18 +137,14 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void bindProgress(NetworkStateItemViewHolder holder){
-        if(networkState == null){
+        networkHolder = holder;
+        
+        if(networkState == null || networkState == NetworkState.LOADING) {
+            holder.progressBar.setVisibility(View.VISIBLE);
             return;
         }
-
-        if(networkState == NetworkState.LOADING){
-            holder.progressBar.setVisibility(View.VISIBLE);
-        }
-        else {
-            holder.progressBar.setVisibility(View.GONE);
-        }
-
-        if(networkState.getStatus() == NetworkState.Status.FAILED) {
+        
+        if(networkState == NetworkState.FAIL) {
             holder.errorMsgView.setVisibility(View.VISIBLE);
             holder.errorMsgView.setText(networkState.getMsg());
         } else {
@@ -148,11 +154,23 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void clearList() {
         events.clear();
+        networkHolder = null;
         notifyDataSetChanged();
     }
 
     public void setNetworkState(NetworkState networkState) {
         this.networkState = networkState;
+        if(this.networkState == NetworkState.FAIL){
+            updateNetworkHolder();
+        }
+    }
+
+    private void updateNetworkHolder() {
+        if(networkHolder != null){
+            networkHolder.progressBar.setVisibility(View.INVISIBLE);
+            networkHolder.errorMsgView.setVisibility(View.VISIBLE);
+            networkHolder.errorMsgView.setText(networkState.getMsg());
+        }
     }
 
     public class EventViewHolder extends RecyclerView.ViewHolder {

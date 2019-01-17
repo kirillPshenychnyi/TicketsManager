@@ -37,6 +37,10 @@ public class QueryParams {
         this.countryCode = countryCode;
     }
 
+    public String getKeywordRaw(){
+        return keyword;
+    }
+
     public String getKeyword() {
         if(keyword.isEmpty()){
             return "%";
@@ -52,8 +56,7 @@ public class QueryParams {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + countryCode.hashCode();
+        int hash = 29 * countryCode.hashCode();
         hash = 29 * hash + keyword.hashCode();
         return hash;
     }

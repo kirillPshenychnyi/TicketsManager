@@ -36,4 +36,7 @@ public interface EventDAO {
                     "ORDER BY startDate ASC"
     )
     Maybe<List<EventInfo>> loadAll(String countryCode, String keyword);
+
+    @Query("SELECT * FROM Event WHERE Event.event_id = :eventId ")
+    Event getEvent(long eventId);
 }

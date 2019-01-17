@@ -7,10 +7,6 @@ import android.support.annotation.NonNull;
 
 import com.example.android.ticketsmanager.datasource.QueryParams;
 
-/**
- * Created by Кирилл on 11/5/2018.
- */
-
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
     private final Context context;
