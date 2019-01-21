@@ -47,23 +47,23 @@ public class ORMFactory {
 
         long eventId =
                 dao.insertEvent(
-                    new Event(
-                        insertLocation(venue.getName(), cityId),
-                        insertClassification(event.getClassifications().get(0)),
-                        event.getName(),
-                        convert(event.getDates().getStart()),
-                        convert(event.getDates().getEnd())
-                )
-            );
+                        new Event(
+                                insertLocation(venue.getName(), cityId),
+                                insertClassification(event.getClassifications().get(0)),
+                                event.getName(),
+                                convert(event.getDates().getStart()),
+                                convert(event.getDates().getEnd())
+                        )
+                );
 
-        for(com.example.android.ticketsmanager.rest.JOM.Image image : event.getImages()){
+        for (com.example.android.ticketsmanager.rest.JOM.Image image : event.getImages()) {
             database.getImageDAO().insertImage(
                     new Image(
                             image.getUrl(),
                             image.getWidth(),
                             image.getHeight(),
                             eventId
-                )
+                    )
             );
         }
     }
@@ -97,14 +97,17 @@ public class ORMFactory {
     }
 
     private long insertSubGenre(com.example.android.ticketsmanager.rest.JOM.SubGenre subGenre, long genreId){
-        ClassificationDao dao = database.getClassificationDao();
+        if (subGenre != null) {
+            ClassificationDao dao = database.getClassificationDao();
+            return this.<SubGenre, com.example.android.ticketsmanager.rest.JOM.SubGenre>getEntity(
+                    subGenre::getId,
+                    (long primaryKey) -> new SubGenre(primaryKey, genreId, subGenre.getName()),
+                    dao::getSubGenre,
+                    dao::insertSubGenre
+            );
+        }
 
-        return this.<SubGenre, com.example.android.ticketsmanager.rest.JOM.SubGenre>getEntity(
-                subGenre::getId,
-                (long primaryKey) -> new SubGenre(primaryKey, genreId, subGenre.getName()),
-                dao::getSubGenre,
-                dao::insertSubGenre
-        );
+        return genreId;
     }
 
     private long insertCountry(String countryName){

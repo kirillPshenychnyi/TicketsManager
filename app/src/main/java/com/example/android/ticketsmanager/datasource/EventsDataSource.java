@@ -49,12 +49,12 @@ public class EventsDataSource{
         this.queryParams = params;
     }
 
-    public void fetchMore(){
+    public void fetchMore() {
         if(networkState.getValue() == NetworkState.LOADING || isEndReached()){
             return;
         }
 
-        if(totalPages != -1){
+        if(totalPages != -1) {
             fetchData();
             return;
         }
@@ -132,6 +132,14 @@ public class EventsDataSource{
         }
     }
 
+    private void fillDB(EventsCollection events){
+        for (Event event : events.getEvents()) {
+            ormFactory.convert(event);
+        }
+
+        networkState.postValue(NetworkState.LOADED);
+    }
+
     private void onLoaded(TicketsResponse response){
         if(response == null) {
             return;
@@ -149,14 +157,7 @@ public class EventsDataSource{
         }
 
         Disposable adding =
-                Completable.fromAction(() -> {
-                            for (Event event : collection.getEvents()) {
-                                ormFactory.convert(event);
-                            }
-
-                            networkState.postValue(NetworkState.LOADED);
-                        }
-                )
+                Completable.fromAction( ()->{ fillDB(collection); } )
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {}, this::onError);

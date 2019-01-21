@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,7 +37,10 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemViewType(int position) {
-        if(position == getItemCount() - 1) {
+        if(
+                position == getItemCount() - 1 &&
+                networkState != null &&
+                networkState == NetworkState.LOADING) {
             return TYPE_PROGRESS;
         }
         else {
@@ -168,6 +172,8 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private void updateNetworkHolder() {
         if(networkHolder != null){
             networkHolder.progressBar.setVisibility(View.INVISIBLE);
+
+            networkHolder.tryAgainButton.setVisibility(View.VISIBLE);
             networkHolder.errorMsgView.setVisibility(View.VISIBLE);
             networkHolder.errorMsgView.setText(networkState.getMsg());
         }
@@ -196,10 +202,12 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         private ProgressBar progressBar;
         private TextView errorMsgView;
+        private Button tryAgainButton;
 
         public NetworkStateItemViewHolder(View itemView) {
             super(itemView);
 
+            tryAgainButton = itemView.findViewById(R.id.tryAgainButton);
             progressBar = itemView.findViewById(R.id.progressBarView);
             errorMsgView = itemView.findViewById(R.id.errorMsgTextView);
         }
