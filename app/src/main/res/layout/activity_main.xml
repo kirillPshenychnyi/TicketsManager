@@ -16,9 +16,25 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/eventsRecyclerView"
+            app:layout_constraintVertical_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:scrollbars="vertical"
+            app:layout_constraintHorizontal_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"
+            android:visibility="invisible"/>
+
+        <include
+            layout="@layout/network_state_item"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/loadingView"
+            android:layout_height="150dp"
+            android:layout_width="150dp"/>
 
     </android.support.constraint.ConstraintLayout>
 

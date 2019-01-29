@@ -170,16 +170,41 @@ public class ORMFactory {
             return null;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm");
-        java.util.Date result = null;
+        Boolean dateTBD = date.getDateTBD();
+        if(dateTBD != null && dateTBD) {
+            return null;
+        }
 
-        String time =
-                date.getLocalDate() + ' ' + date.getLocalTime();
+        Boolean dateTBA = date.getTimeTBA();
+        if(dateTBA != null && dateTBA){
+            return null;
+        }
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+
+        java.util.Date result = null;
+        String dateStr = date.getLocalDate();
 
         try {
-            result = dateFormat.parse(time);
+            result = dateFormat.parse(dateStr);
         } catch (ParseException e) {
             e.printStackTrace();
+        }
+
+        Boolean timeTBA = date.getTimeTBA();
+
+        String localTime = date.getLocalTime();
+
+        if(timeTBA != null && !timeTBA && localTime != null){
+            try {
+                DateFormat timeFormat = new SimpleDateFormat("hh:mm");
+                java.util.Date time = timeFormat.parse(date.getLocalTime());
+                result.setHours(time.getHours());
+                result.setMinutes(time.getMinutes());
+            }
+            catch (ParseException ex){
+                ex.printStackTrace();
+            }
         }
 
         return result;

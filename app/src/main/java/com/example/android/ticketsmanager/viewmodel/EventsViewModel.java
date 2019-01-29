@@ -20,8 +20,12 @@ import io.reactivex.schedulers.Schedulers;
 
 public class EventsViewModel extends ViewModel {
 
-    public interface OnDbResult{
+    public interface OnDbResultCallback {
         void onResult(List<EventInfo> infos);
+    }
+
+    public interface OnErrorCallback {
+        void onError(Throwable error);
     }
 
     private final Context context;
@@ -62,19 +66,30 @@ public class EventsViewModel extends ViewModel {
             });
     }
 
-    public void fetchFromDb(OnDbResult onDbResult){
+    public void fetchFromDb(OnDbResultCallback onDbResultCallback, OnErrorCallback errorHandler){
         EventDAO dao = AppDatabase.getsInstance(context).getEventDao();
 
-        subscribe(dao.loadAll(params.getCountryCode(), params.getKeyword()), onDbResult);
+        subscribe(
+                dao.loadAll(params.getCountryCode(), params.getKeyword()),
+                onDbResultCallback,
+                errorHandler);
     }
 
-    private void subscribe(Maybe<List<EventInfo>> request, OnDbResult onDbResult){
+    private void subscribe(
+            Maybe<List<EventInfo>> request,
+            OnDbResultCallback onDbResultCallback,
+            OnErrorCallback errorHandler){
         request.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(eventInfos -> onDbResult.onResult(eventInfos));
+                .subscribe(onDbResultCallback::onResult, errorHandler::onError);
     }
 
     public void fetchMore(){
+        dataSource.fetchMore();
+    }
+
+    public void tryAgain(){
+        dataSource.recoverFromError();
         dataSource.fetchMore();
     }
 

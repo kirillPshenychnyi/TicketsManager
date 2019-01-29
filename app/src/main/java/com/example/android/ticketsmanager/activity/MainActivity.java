@@ -13,13 +13,16 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.android.ticketsmanager.R;
 import com.example.android.ticketsmanager.adapter.EventsAdapter;
 import com.example.android.ticketsmanager.datasource.QueryParams;
 import com.example.android.ticketsmanager.datasource.RequestExtractor;
 import com.example.android.ticketsmanager.db.EventInfo;
-import com.example.android.ticketsmanager.utils.NetworkState;
 import com.example.android.ticketsmanager.utils.StringUtils;
 import com.example.android.ticketsmanager.viewmodel.EventsViewModel;
 import com.example.android.ticketsmanager.viewmodel.ViewModelFactory;
@@ -27,11 +30,14 @@ import com.example.android.ticketsmanager.viewmodel.ViewModelFactory;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-    implements  NavigationView.OnNavigationItemSelectedListener {
+    implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
+    private View loadingView;
+
     private EventsAdapter adapter;
     private LinearLayoutManager layoutManager;
+    private ErrorHandler errorHandler;
 
     private EventsViewModel viewModel;
 
@@ -46,20 +52,23 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         recyclerView = mainView.findViewById(R.id.eventsRecyclerView);
+        loadingView = mainView.findViewById(R.id.loadingView);
+
+        errorHandler = new ErrorHandler(loadingView);
 
         layoutManager = new LinearLayoutManager(this);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new EventsAdapter();
-        recyclerView.setAdapter(adapter);
-
         viewModel = ViewModelProviders.of(
                 this,
                 new ViewModelFactory(this, createQueryParams())
         ).get(EventsViewModel.class);
 
+        adapter = new EventsAdapter(() -> viewModel.tryAgain());
+
+        recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -104,7 +113,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == SearchEventActivity.SEARCH_RESULT && resultCode == RESULT_OK){
-
             adapter.clearList();
             viewModel.unsubscribe(this);
 
@@ -123,28 +131,54 @@ public class MainActivity extends AppCompatActivity
 
     private void setEventsList(List<EventInfo> eventsList){
         adapter.setEvents(eventsList);
+        if(!eventsList.isEmpty()) {
+            makeListVisible();
+        }
     }
 
     private void loadInitial(){
+        makeListInvisible();
         viewModel.fetchFromDb(
                 eventsList -> {
-                    if(eventsList.isEmpty()){
+                    if(eventsList.isEmpty()) {
                         viewModel.searchEvents();
                     } else {
                         setEventsList(eventsList);
                     }
-                }
+                },
+                this::onError
         );
+    }
+
+    private void onError(Throwable error) {
+        errorHandler.showErrorState();
+    }
+
+    private void makeListVisible() {
+        loadingView.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void makeListInvisible() {
+        loadingView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
     }
 
     private void subscribeLiveData(){
         viewModel.getNetworkStateLiveData().observe(
                 this,
                 networkState -> {
-                    adapter.setNetworkState(networkState);
-
-                    if(networkState == NetworkState.LOADED){
-                        viewModel.fetchFromDb(this::setEventsList);
+                    switch (networkState){
+                        case SUCCESS:
+                            viewModel.fetchFromDb(this::setEventsList, this::onError);
+                            break;
+                        case FAILED:
+                            adapter.setNetworkState(networkState);
+                            errorHandler.showErrorState();
+                            break;
+                        case RUNNING:
+                            adapter.setNetworkState(networkState);
+                            break;
                     }
                 }
         );
@@ -189,9 +223,43 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
 
-        editor.putString(getString(R.string.country_code) ,params.getCountryCode());
+        editor.putString(getString(R.string.country_code), params.getCountryCode());
         editor.putString(getString(R.string.keyword_extra), params.getKeywordRaw());
 
         editor.commit();
+    }
+
+    private class ErrorHandler{
+
+        private final View parentView;
+        private final ProgressBar progressBar;
+        private final TextView errorMsg;
+        private final Button tryAgainButton;
+
+        public ErrorHandler(View parentView){
+            this.parentView = parentView;
+
+            progressBar = parentView.findViewById(R.id.progressBarView);
+
+            errorMsg = parentView.findViewById(R.id.errorMsgTextView);
+
+            tryAgainButton = parentView.findViewById(R.id.tryAgainButton);
+            tryAgainButton.setOnClickListener(
+                    v -> {
+                        progressBar.setVisibility(View.VISIBLE);
+                        errorMsg.setVisibility(View.INVISIBLE);
+                        tryAgainButton.setVisibility(View.INVISIBLE);
+                        viewModel.fetchMore();
+                    }
+            );
+        }
+
+        public void showErrorState() {
+            if(parentView.getVisibility() == View.VISIBLE) {
+                progressBar.setVisibility(View.INVISIBLE);
+                errorMsg.setVisibility(View.VISIBLE);
+                tryAgainButton.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }

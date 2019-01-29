@@ -49,8 +49,14 @@ public class EventsDataSource{
         this.queryParams = params;
     }
 
+    public void recoverFromError(){
+        networkState.setValue(NetworkState.RECOVER);
+    }
+
     public void fetchMore() {
-        if(networkState.getValue() == NetworkState.LOADING || isEndReached()){
+        NetworkState networkStatus = networkState.getValue();
+
+        if(networkStatus == NetworkState.RUNNING || networkStatus == NetworkState.FAILED || isEndReached()) {
             return;
         }
 
@@ -91,7 +97,7 @@ public class EventsDataSource{
             return;
         }
 
-        networkState.setValue(NetworkState.LOADING);
+        networkState.setValue(NetworkState.RUNNING);
 
         Disposable disposable = App.getApi().getEvents(
                 queryParams.getCountryCode(),
@@ -137,7 +143,7 @@ public class EventsDataSource{
             ormFactory.convert(event);
         }
 
-        networkState.postValue(NetworkState.LOADED);
+        networkState.postValue(NetworkState.SUCCESS);
     }
 
     private void onLoaded(TicketsResponse response){
@@ -185,7 +191,7 @@ public class EventsDataSource{
     }
 
     private void onError(Throwable error){
-        networkState.setValue(NetworkState.FAIL);
+        networkState.setValue(NetworkState.FAILED);
         Log.d(EventsDataSource.class.getName(), error.getMessage());
     }
 }
