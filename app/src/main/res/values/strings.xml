@@ -22,5 +22,6 @@
     <string name="country_code">country_code</string>
     <string name="try_again">Try again</string>
     <string name="fetchFailed">Loading failled. Please, try again</string>
+    <string name="noDataFound">No events matching the current filtering criteria were found</string>
 
 </resources>

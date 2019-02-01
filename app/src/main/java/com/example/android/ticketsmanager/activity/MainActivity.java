@@ -33,11 +33,10 @@ public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
-    private View loadingView;
 
     private EventsAdapter adapter;
     private LinearLayoutManager layoutManager;
-    private ErrorHandler errorHandler;
+    private ViewHandler errorHandler;
 
     private EventsViewModel viewModel;
 
@@ -52,9 +51,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         recyclerView = mainView.findViewById(R.id.eventsRecyclerView);
-        loadingView = mainView.findViewById(R.id.loadingView);
 
-        errorHandler = new ErrorHandler(loadingView);
+        errorHandler = new ViewHandler(
+                recyclerView,
+                mainView.findViewById(R.id.loadingView),
+                mainView.findViewById(R.id.noDataFetchedView));
 
         layoutManager = new LinearLayoutManager(this);
 
@@ -114,13 +115,12 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == SearchEventActivity.SEARCH_RESULT && resultCode == RESULT_OK){
             adapter.clearList();
-            viewModel.unsubscribe(this);
+            viewModel.reset();
 
             QueryParams params = createQueryParams(data);
             saveRequestParams(params);
 
             viewModel.setParams(params);
-            subscribeLiveData();
             loadInitial();
 
             return;
@@ -133,6 +133,9 @@ public class MainActivity extends AppCompatActivity
         adapter.setEvents(eventsList);
         if(!eventsList.isEmpty()) {
             makeListVisible();
+        }
+        else {
+            errorHandler.showNoDataFetchedView();
         }
     }
 
@@ -151,17 +154,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void onError(Throwable error) {
+        error.printStackTrace();
         errorHandler.showErrorState();
     }
 
     private void makeListVisible() {
-        loadingView.setVisibility(View.INVISIBLE);
-        recyclerView.setVisibility(View.VISIBLE);
+        errorHandler.showLoading(false);
     }
 
     private void makeListInvisible() {
-        loadingView.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.INVISIBLE);
+        errorHandler.showLoading(true);
     }
 
     private void subscribeLiveData(){
@@ -229,21 +231,24 @@ public class MainActivity extends AppCompatActivity
         editor.commit();
     }
 
-    private class ErrorHandler{
+    private class ViewHandler {
 
-        private final View parentView;
+        private final View itemsView;
+        private final View networkStateView;
+        private final View noDataFetchedView;
         private final ProgressBar progressBar;
         private final TextView errorMsg;
         private final Button tryAgainButton;
 
-        public ErrorHandler(View parentView){
-            this.parentView = parentView;
+        public ViewHandler(View itemsView, View networkStateView, View noDataFetchedView){
+            this.itemsView = itemsView;
+            this.networkStateView = networkStateView;
+            this.noDataFetchedView = noDataFetchedView;
 
-            progressBar = parentView.findViewById(R.id.progressBarView);
+            progressBar = networkStateView.findViewById(R.id.progressBarView);
+            errorMsg = networkStateView.findViewById(R.id.errorMsgTextView);
 
-            errorMsg = parentView.findViewById(R.id.errorMsgTextView);
-
-            tryAgainButton = parentView.findViewById(R.id.tryAgainButton);
+            tryAgainButton = networkStateView.findViewById(R.id.tryAgainButton);
             tryAgainButton.setOnClickListener(
                     v -> {
                         progressBar.setVisibility(View.VISIBLE);
@@ -255,11 +260,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         public void showErrorState() {
-            if(parentView.getVisibility() == View.VISIBLE) {
+            if(networkStateView.getVisibility() == View.VISIBLE) {
                 progressBar.setVisibility(View.INVISIBLE);
                 errorMsg.setVisibility(View.VISIBLE);
                 tryAgainButton.setVisibility(View.VISIBLE);
             }
+        }
+
+        public void showNoDataFetchedView(){
+            networkStateView.setVisibility(View.INVISIBLE);
+            noDataFetchedView.setVisibility(View.VISIBLE);
+        }
+
+        public void showLoading(boolean isShown) {
+            itemsView.setVisibility(isShown ? View.INVISIBLE : View.VISIBLE);
+            noDataFetchedView.setVisibility(View.INVISIBLE);
+            networkStateView.setVisibility(isShown ? View.VISIBLE : View.INVISIBLE);
         }
     }
 }

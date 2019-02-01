@@ -36,6 +36,18 @@
             android:layout_height="150dp"
             android:layout_width="150dp"/>
 
+        <TextView
+            android:id="@+id/noDataFetchedView"
+            android:text="@string/noDataFound"
+            android:textSize="12sp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="invisible" />
+
     </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.NavigationView

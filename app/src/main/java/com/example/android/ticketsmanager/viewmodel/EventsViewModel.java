@@ -1,6 +1,5 @@
 package com.example.android.ticketsmanager.viewmodel;
 
-import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
@@ -39,8 +38,7 @@ public class EventsViewModel extends ViewModel {
         setParams(params);
     }
 
-    public void unsubscribe(LifecycleOwner owner){
-        dataSource.getNetworkState().removeObservers(owner);
+    public void reset(){
         dataSource.reset();
     }
 

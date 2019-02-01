@@ -107,7 +107,7 @@ public class EventsDataSource{
         )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(events -> onLoaded(events), this::onError);
+                .subscribe(this::onLoaded, this::onError);
 
         incrementPage();
 
@@ -121,9 +121,7 @@ public class EventsDataSource{
         long id = queryParams.hashCode();
 
         Disposable adding =
-                Completable.fromAction(() -> {
-                    requestInfoDao.updateLastPage(id, currentPage);
-                })
+                Completable.fromAction(() -> requestInfoDao.updateLastPage(id, currentPage))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {}, this::onError);
@@ -147,7 +145,8 @@ public class EventsDataSource{
     }
 
     private void onLoaded(TicketsResponse response){
-        if(response == null) {
+        if(response == null || response.getEventsCollection() == null) {
+            networkState.setValue(NetworkState.SUCCESS);
             return;
         }
 
@@ -157,13 +156,8 @@ public class EventsDataSource{
         }
 
         EventsCollection collection = response.getEventsCollection();
-
-        if(collection == null){
-            return;
-        }
-
         Disposable adding =
-                Completable.fromAction( ()->{ fillDB(collection); } )
+                Completable.fromAction( ()->fillDB(collection) )
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {}, this::onError);
