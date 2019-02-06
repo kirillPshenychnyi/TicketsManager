@@ -4,23 +4,49 @@ import android.content.Context;
 import android.content.res.Resources;
 
 import com.example.android.ticketsmanager.R;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableBiMap;
 
 public class StringUtils {
 
-    static public String toCounrtyCode(Context context, String countryName){
+    private BiMap<String, String> code2FullName;
+
+    static StringUtils sInstance;
+
+    static public StringUtils getInstance(Context context) {
+        if(sInstance == null){
+            sInstance = new StringUtils(context);
+        }
+
+        return sInstance;
+    }
+
+    private StringUtils(Context context){
+        code2FullName = HashBiMap.create();
+
+        ImmutableBiMap.Builder<String, String> builder = ImmutableBiMap.builder();
+
         Resources resources = context.getResources();
-        if(countryName.equals(resources.getString(R.string.united_kingdom))){
-            return resources.getString(R.string.uk);
+
+        String[] countryNames = resources.getStringArray(R.array.countries);
+        String[] countryCodes = resources.getStringArray(R.array.country_codes);
+
+        int entriesSize = countryNames.length;
+        for(int i = 0; i < entriesSize; ++i){
+            builder.put(countryNames[i], countryCodes[i]);
         }
 
-        if(countryName.equals(resources.getString(R.string.united_states))){
-            return resources.getString(R.string.us);
-        }
+        code2FullName = builder.build();
+    }
 
-        if(countryName.equals(resources.getString(R.string.canada))){
-            return resources.getString(R.string.ca);
-        }
+    public String toCounrtyCode(String countryName) {
+        String code = code2FullName.get(countryName);
+        return code != null ? code : "";
+    }
 
-        return "";
+    public String fromCountryCode(String countryCode) {
+        String name = code2FullName.inverse().get(countryCode);
+        return name != null ? name : countryCode;
     }
 }

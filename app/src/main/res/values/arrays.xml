@@ -5,6 +5,16 @@
         <item>@string/united_states</item>
         <item>@string/canada</item>
         <item>@string/united_kingdom</item>
+        <item>@string/mexico</item>
+        <item>@string/germany</item>>
     </string-array>
+
+    <string-array name="country_codes">
+        <item>@string/us_country_code</item>
+        <item>@string/canada_country_code</item>
+        <item>@string/uk_country_code</item>
+        <item>@string/mexico_country_code</item>
+        <item>@string/germany_country_code</item>>
+    </string-array>>
 
 </resources>

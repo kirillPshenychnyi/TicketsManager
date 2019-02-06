@@ -33,6 +33,7 @@ dependencies {
     // optional - RxJava support for Room
     implementation "android.arch.persistence.room:rxjava2:$room_version"
 
+    api 'com.google.guava:guava:27.0.1-android'
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.0'

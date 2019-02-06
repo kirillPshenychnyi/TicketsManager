@@ -13,10 +13,15 @@
     <string name="united_states">United States</string>
     <string name="united_kingdom">United Kingdom</string>
     <string name="canada">Canada</string>
+    <string name="mexico">Mexico</string>>
+    <string name="germany">Germany</string>>
 
-    <string name="us">US</string>
-    <string name="uk">UK</string>
-    <string name="ca">CA</string>
+    <string name="us_country_code">US</string>
+    <string name="uk_country_code">UK</string>
+    <string name="canada_country_code">CA</string>
+    <string name="mexico_country_code">MX</string>>
+    <string name="germany_country_code">DE</string>>
+
     <string name="tba">TBA</string>
 
     <string name="country_code">country_code</string>

@@ -2,6 +2,8 @@ package com.example.android.ticketsmanager.db;
 
 import android.content.Context;
 
+import com.example.android.ticketsmanager.App;
+import com.example.android.ticketsmanager.datasource.DisposableScheduler;
 import com.example.android.ticketsmanager.rest.JOM.Classification;
 import com.example.android.ticketsmanager.rest.JOM.Date;
 import com.example.android.ticketsmanager.rest.JOM.Venue;
@@ -9,6 +11,10 @@ import com.example.android.ticketsmanager.rest.JOM.Venue;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class ORMFactory {
 
@@ -28,10 +34,16 @@ public class ORMFactory {
         T create(long primaryKey);
     }
 
-    private final AppDatabase database;
+    public interface ErrorHandler {
+        void handle(Throwable ex);
+    }
 
-    public ORMFactory(Context context){
-        database = AppDatabase.getsInstance(context);
+    private final AppDatabase database;
+    private final ErrorHandler handler;
+
+    public ORMFactory(Context context, ErrorHandler handler){
+        this.handler = handler;
+        this.database = AppDatabase.getsInstance(context);
     }
 
     public void convert(com.example.android.ticketsmanager.rest.JOM.Event event){
@@ -48,7 +60,7 @@ public class ORMFactory {
         long eventId =
                 dao.insertEvent(
                         new Event(
-                                insertLocation(venue.getName(), cityId),
+                                insertLocation(venue.getName(), venue.getId(), cityId),
                                 insertClassification(event.getClassifications().get(0)),
                                 event.getName(),
                                 convert(event.getDates().getStart()),
@@ -123,7 +135,6 @@ public class ORMFactory {
     }
 
     private long insertCity(String cityName, long countryId){
-
         LocationDao dao = database.getLocationDao();
 
         City city = dao.getCity(cityName);
@@ -135,18 +146,37 @@ public class ORMFactory {
         return dao.insertCity(new City(cityName, countryId));
     }
 
-    private long insertLocation(String locationName, long cityId){
+    private long insertLocation(String locationName, String venueId, long cityId){
         LocationDao locationDao = database.getLocationDao();
 
+        StringBuffer locationBuffer = new StringBuffer();
+
+        if(locationName != null && !locationName.isEmpty()){
+            locationBuffer.append(locationName);
+        }
+        else {
+            Disposable disposable = App.getApi().getVenue(venueId, App.getApiKey())
+                    .subscribeOn(Schedulers.from(Runnable::run))
+                    .observeOn(Schedulers.from(Runnable::run))
+                    .subscribe(
+                            venue -> locationBuffer.append(venue.getName()),
+                            handler::handle);
+
+
+            DisposableScheduler.getInstance().post(disposable);
+        }
+
+        String actualLocation = locationBuffer.toString();
+
         com.example.android.ticketsmanager.db.Location location =
-                locationDao.getLocation(locationName);
+                locationDao.getLocation(actualLocation);
 
         if(location != null){
             return location.getLocation_id();
         }
 
         return locationDao.insertLocation(
-                new com.example.android.ticketsmanager.db.Location(locationName, cityId)
+                new com.example.android.ticketsmanager.db.Location(actualLocation, cityId)
         );
     }
 
@@ -180,7 +210,7 @@ public class ORMFactory {
             return null;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH);
 
         java.util.Date result = null;
         String dateStr = date.getLocalDate();
@@ -197,7 +227,7 @@ public class ORMFactory {
 
         if(timeTBA != null && !timeTBA && localTime != null){
             try {
-                DateFormat timeFormat = new SimpleDateFormat("hh:mm");
+                DateFormat timeFormat = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
                 java.util.Date time = timeFormat.parse(date.getLocalTime());
                 result.setHours(time.getHours());
                 result.setMinutes(time.getMinutes());

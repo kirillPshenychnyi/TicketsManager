@@ -16,26 +16,23 @@ import com.example.android.ticketsmanager.utils.NetworkState;
 
 import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class EventsDataSource{
 
-    private CompositeDisposable compositeDisposable;
     private final ORMFactory ormFactory;
     private final Context context;
-    private MutableLiveData<NetworkState> networkState;
+    private final MutableLiveData<NetworkState> networkState;
 
     private QueryParams queryParams;
 
-    int currentPage;
-    int totalPages;
+    private int currentPage;
+    private int totalPages;
 
     public EventsDataSource(Context context){
         this.context = context;
-        this.compositeDisposable = new CompositeDisposable();
-        this.ormFactory = new ORMFactory(context);
+        this.ormFactory = new ORMFactory(context, this::onError);
 
         this.networkState = new MutableLiveData<>();
 
@@ -84,7 +81,7 @@ public class EventsDataSource{
                                 }
                         );
 
-        compositeDisposable.add(requestParams);
+        DisposableScheduler.getInstance().post(requestParams);
     }
 
     public void reset(){
@@ -111,7 +108,7 @@ public class EventsDataSource{
 
         incrementPage();
 
-        compositeDisposable.add(disposable);
+        DisposableScheduler.getInstance().post(disposable);
     }
 
     private void incrementPage() {
@@ -126,7 +123,7 @@ public class EventsDataSource{
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {}, this::onError);
 
-        compositeDisposable.add(adding);
+        DisposableScheduler.getInstance().post(adding);
     }
 
     private void onParamsLoaded(RequestInfo info){
@@ -139,6 +136,9 @@ public class EventsDataSource{
     private void fillDB(EventsCollection events){
         for (Event event : events.getEvents()) {
             ormFactory.convert(event);
+            if(networkState.getValue() == NetworkState.FAILED){
+                break;
+            }
         }
 
         networkState.postValue(NetworkState.SUCCESS);
@@ -162,7 +162,7 @@ public class EventsDataSource{
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {}, this::onError);
 
-        compositeDisposable.add(adding);
+        DisposableScheduler.getInstance().post(adding);
     }
 
     private void saveRequestInfo(){
@@ -177,7 +177,7 @@ public class EventsDataSource{
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {}, this::onError);
 
-        compositeDisposable.add(adding);
+        DisposableScheduler.getInstance().post(adding);
     }
 
     private boolean isEndReached(){
@@ -185,7 +185,7 @@ public class EventsDataSource{
     }
 
     private void onError(Throwable error){
-        networkState.setValue(NetworkState.FAILED);
+        networkState.postValue(NetworkState.FAILED);
         Log.d(EventsDataSource.class.getName(), error.getMessage());
     }
 }

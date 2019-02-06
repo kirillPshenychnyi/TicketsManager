@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.example.android.ticketsmanager.R;
 import com.example.android.ticketsmanager.db.EventInfo;
 import com.example.android.ticketsmanager.utils.NetworkState;
+import com.example.android.ticketsmanager.utils.StringUtils;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -30,11 +31,13 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int TYPE_PROGRESS = 0;
     private static final int TYPE_ITEM = 1;
 
+    private final Context context;
     private final OnTryAgainDispatcher tryAgainDispatcher;
     private List<EventInfo> events;
     private NetworkStateItemViewHolder networkStateItemViewHolder;
 
-    public EventsAdapter(OnTryAgainDispatcher tryAgainDispatcher){
+    public EventsAdapter(OnTryAgainDispatcher tryAgainDispatcher, Context context){
+        this.context = context;
         this.tryAgainDispatcher = tryAgainDispatcher;
     }
 
@@ -92,11 +95,18 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
         if(holder instanceof NetworkStateItemViewHolder){
             bindProgress((NetworkStateItemViewHolder) holder);
-            return;
         }
+        else {
+            bindEvent((EventViewHolder)holder, position);
+        }
+    }
 
-        EventViewHolder eventHolder = (EventViewHolder)holder;
+    private void bindProgress(NetworkStateItemViewHolder holder){
+        networkStateItemViewHolder = holder;
+        holder.progressBar.setVisibility(View.VISIBLE);
+    }
 
+    private void bindEvent(EventsAdapter.EventViewHolder eventHolder, int position) {
         EventInfo event = events.get(position);
         eventHolder.textView.setText(event.getEventName());
 
@@ -104,36 +114,34 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MMMM dd", Locale.ENGLISH);
 
         Date startDate = event.getStartDate();
-        if(startDate != null) {
+        if (startDate != null) {
             eventHolder.eventDate.setText(dateFormat.format(startDate.getTime()));
             eventHolder.eventTime.setText(timeFormat.format(startDate.getTime()));
-        }
-        else {
+        } else {
             eventHolder.eventTime.setText("TBA");
         }
 
-        eventHolder .eventLocation.setText(
+        eventHolder.eventLocation.setText(
                 String.format("%s\n%s, %s",
                         event.getLocationName(),
-                    event.getCountryName(),
+                        StringUtils.getInstance(context).fromCountryCode(event.getCountryName()),
                         event.getCityName()
                 )
         );
 
         List<com.example.android.ticketsmanager.db.Image> images = event.getImages();
-        if(images.isEmpty()){
-            eventHolder .eventImage.setImageResource(R.drawable.no_image_available);
-        }
-        else {
+        if (images.isEmpty()) {
+            eventHolder.eventImage.setImageResource(R.drawable.no_image_available);
+        } else {
 
             String imageUrl = images.get(0).getUrl();
 
             int nImages = images.size();
 
-            for(int i = 0; i < nImages; ++i) {
+            for (int i = 0; i < nImages; ++i) {
                 com.example.android.ticketsmanager.db.Image current = images.get(i);
 
-                if(current.getWidth() == 1024) {
+                if (current.getWidth() == 1024) {
                     imageUrl = current.getUrl();
                     break;
                 }
@@ -142,13 +150,8 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             Picasso picasso = Picasso.get();
             picasso.load(imageUrl)
                     .placeholder(R.drawable.no_image_available)
-                    .into(eventHolder .eventImage);
+                    .into(eventHolder.eventImage);
         }
-    }
-
-    private void bindProgress(NetworkStateItemViewHolder holder){
-        networkStateItemViewHolder = holder;
-        holder.progressBar.setVisibility(View.VISIBLE);
     }
 
     public void clearList() {

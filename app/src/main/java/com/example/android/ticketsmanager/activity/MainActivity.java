@@ -32,8 +32,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
 
-    private RecyclerView recyclerView;
-
     private EventsAdapter adapter;
     private LinearLayoutManager layoutManager;
     private ViewHandler errorHandler;
@@ -50,8 +48,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = mainView.findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        recyclerView = mainView.findViewById(R.id.eventsRecyclerView);
-
+        RecyclerView recyclerView = mainView.findViewById(R.id.eventsRecyclerView);
         errorHandler = new ViewHandler(
                 recyclerView,
                 mainView.findViewById(R.id.loadingView),
@@ -67,7 +64,7 @@ public class MainActivity extends AppCompatActivity
                 new ViewModelFactory(this, createQueryParams())
         ).get(EventsViewModel.class);
 
-        adapter = new EventsAdapter(() -> viewModel.tryAgain());
+        adapter = new EventsAdapter(viewModel::tryAgain, this);
 
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -195,9 +192,8 @@ public class MainActivity extends AppCompatActivity
                 R.string.country_extra,
                 data::getStringExtra,
                 (countryName) ->
-                        paramsBuilder.setCountryCode((StringUtils.toCounrtyCode(
-                                this,
-                                countryName))
+                        paramsBuilder.setCountryCode(
+                                StringUtils.getInstance(this).toCounrtyCode(countryName)
                         )
         );
 
@@ -216,7 +212,7 @@ public class MainActivity extends AppCompatActivity
         QueryParams.QueryParamsBuilder builder = new QueryParams.QueryParamsBuilder();
 
         return builder
-                .setCountryCode(preferences.getString(getString(R.string.country_code), "UK"))
+                .setCountryCode(preferences.getString(getString(R.string.country_code), "DE"))
                 .setKeyword(preferences.getString(getString(R.string.keyword_extra), ""))
                 .build();
     }
@@ -227,12 +223,10 @@ public class MainActivity extends AppCompatActivity
 
         editor.putString(getString(R.string.country_code), params.getCountryCode());
         editor.putString(getString(R.string.keyword_extra), params.getKeywordRaw());
-
-        editor.commit();
+        editor.apply();
     }
 
     private class ViewHandler {
-
         private final View itemsView;
         private final View networkStateView;
         private final View noDataFetchedView;
